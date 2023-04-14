@@ -17,8 +17,8 @@ def location_kb():
 # knopka dlya vibora pola
 def gender_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    button = KeyboardButton('Мужчина 👨️')
-    button2 = KeyboardButton('Женщина 👩')
+    button = KeyboardButton('Мужчина ')
+    button2 = KeyboardButton('Женщина ')
     kb.add(button, button2)
     return kb
 
