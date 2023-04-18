@@ -67,7 +67,7 @@ async def get_gender(message, state=Registration.getting_gender):
 
     database.add_user(user_id, name, phone_number, latitude, longitude, gender)
     print(database.get_users())
-
+    await message.answer('Выберите продукт из списка', reply_markup=buttons.products_kb())
     await state.finish()
 
 # независимый обработчик текста для основного меню
