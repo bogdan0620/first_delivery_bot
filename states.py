@@ -9,7 +9,6 @@ class Registration(StatesGroup):
 
 # processi dlya vibora opredelennogo tovara
 class GetProduct(StatesGroup):
-    getting_pr_name = State()
     getting_pr_count = State()
 
 # processi pri rabote s korzinoy

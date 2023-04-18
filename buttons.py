@@ -1,4 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+import database
 
 # knopka dlya otpravki nomera telefona
 def phone_number_kb():
@@ -17,8 +18,8 @@ def location_kb():
 # knopka dlya vibora pola
 def gender_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    button = KeyboardButton('Мужчина ')
-    button2 = KeyboardButton('Женщина ')
+    button = KeyboardButton('Мужчина')
+    button2 = KeyboardButton('Женщина')
     kb.add(button, button2)
     return kb
 
@@ -59,13 +60,21 @@ def confirmation_kb():
     return kb
 
 
-
-
-
-
-
-
-
 # knopki s nazvaniyami tovarov
 def products_kb():
-    pass
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+
+    cart = KeyboardButton('Корзина')
+    zakaz = KeyboardButton('Оформить заказ')
+
+    all_products = database.get_product_name()
+
+    #генерируем список кнопок с названиями продуктов
+    buttons = [KeyboardButton(i[0]) for i in all_products]
+
+    # добавляем в пространство
+    kb.add(cart, zakaz)
+    kb.add(*buttons)
+
+    return kb
+

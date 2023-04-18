@@ -11,10 +11,20 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 @dp.message_handler(commands=['start'])
 async def start_command(message):
+
+    # получить user_id ползователя
     user_id = message.from_user.id
-    start_text = 'Это бот доставки еды\nЧтобы начать процесс регистрации введите свое имя'
-    await message.answer(start_text, reply_markup=ReplyKeyboardRemove())
-    await Registration.getting_name_state.set()
+    # происхолит проверка в базе
+    checker = database.chek_user(user_id)
+
+    if checker:
+        # если есть в базе
+        await message.answer('Выбери продукт', reply_markup=buttons.products_kb())
+
+    else:
+        start_text = 'Это бот доставки еды\nЧтобы начать процесс регистрации введите свое имя'
+        await message.answer(start_text, reply_markup=ReplyKeyboardRemove())
+        await Registration.getting_name_state.set()
 
 @dp.message_handler(state=Registration.getting_name_state, content_types=['text'])
 async def get_user_name(message, state=Registration.getting_name_state):
@@ -41,6 +51,8 @@ async def get_location(message, state=Registration.getting_location):
     await state.update_data(latitude=user_answer, longitude=user_answer_2)
     await message.answer('Выбери свой пол', reply_markup=buttons.gender_kb())
     await Registration.getting_gender.set()
+
+
 @dp.message_handler(state=Registration.getting_gender, content_types=['text'])
 async def get_gender(message, state=Registration.getting_gender):
     user_gender = message.text
@@ -56,12 +68,29 @@ async def get_gender(message, state=Registration.getting_gender):
     database.add_user(user_id, name, phone_number, latitude, longitude, gender)
     print(database.get_users())
 
-
-
-
-
     await state.finish()
 
+# независимый обработчик текста для основного меню
+@dp.message_handler(content_types=['text'])
+async def text_messages(message):
+    user_answer = message.text
 
-if __name__ == '__main__':
-    executor.start_polling(dp)
+    actual_products = [i[0] for i in database.get_product_name()]
+
+    if user_answer == 'Корзина':
+        await message.answer('Ваша корзина')
+
+    elif user_answer == 'Оформить заказ':
+        await message.answer('Оформляем заказ')
+
+    elif user_answer in actual_products:
+        await message.answer('Выберите количество', reply_markup=buttons.product_count())
+    # дз прописать процесс выбора количества
+    # перекинуть на этап получения количества продукта
+    # создать обработчик для сохранения выбранного количества
+    else:
+        await message.answer('Выберите продукт из списка', reply_markup=buttons.products_kb())
+
+
+
+executor.start_polling(dp)
